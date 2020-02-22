@@ -238,6 +238,7 @@ bool PurePursuit::verifyFollowing() const
   double displacement = getDistanceBetweenLineAndPoint(current_pose_.pose.position, a, b, c);
   double relative_angle = getRelativeAngle(current_waypoints_.getWaypointPose(1), current_pose_.pose);
   //ROS_ERROR("side diff : %lf , angle diff : %lf",displacement,relative_angle);
+  // return true;
   if (displacement < displacement_threshold_ && relative_angle < relative_angle_threshold_)
   {
     // ROS_INFO("Following : True");
@@ -253,19 +254,21 @@ geometry_msgs::Twist PurePursuit::calcTwist(double curvature, double cmd_velocit
 {
   // verify whether vehicle is following the path
   bool following_flag = verifyFollowing();
-  static double prev_angular_velocity = 0;
+  static double prev_angular_velocity;
 
   geometry_msgs::Twist twist;
   twist.linear.x = cmd_velocity;
-  if (!following_flag)
-  {
-    //ROS_ERROR_STREAM("Not following");
-    twist.angular.z = current_velocity_.twist.linear.x * curvature;
-  }
-  else
-  {
-    twist.angular.z = prev_angular_velocity;
-  }
+
+  twist.angular.z = current_velocity_.twist.linear.x * curvature;
+//  if (!following_flag)
+//  {
+//    //ROS_ERROR_STREAM("Not following");
+//    twist.angular.z = current_velocity_.twist.linear.x * curvature;
+//  }
+//  else
+//  {
+//    twist.angular.z = prev_angular_velocity;
+//  }
 
   prev_angular_velocity = twist.angular.z;
   return twist;
